@@ -33,7 +33,12 @@
 		 * Default options.
 		 */
 		defaultOptions : {
-			'delay' : 2500
+			'delay' : 2500,
+			'previous' : '&laquo;',
+			'next' : '&raquo;',
+			'navButtonClass' : 'navButton',
+			'previousButtonClass' : 'prevButton',
+			'nextButtonClass' : 'nextButton'
 		},
 		
 		/**
@@ -64,25 +69,19 @@
 				// Hide all but the first item
 				$$.find('li').not(':first').hide();
 				// Create the previous and next buttons; attach event handlers
-				var prevButton = $('<a class="navButton prevButton"><span>&laquo;</span></a>');
-				var nextButton = $('<a class="navButton nextButton"><span>&raquo;</span></a>');
+				var prevButton = $('<a class="'+options.navButtonClass+' '+options.previousButtonClass+'"><span>'+options.previous+'</span></a>');
+				var nextButton = $('<a class="'+options.navButtonClass+' '+options.nextButtonClass+'"><span>'+options.next+'</span></a>');
 				$$.mouseenter(function(event) {
 					clearInterval(interval);
 					interval = null;
 				}).mouseleave(function(event) {
 					interval = setInterval(setItemVisible, options.delay);
 				}).prepend(
-					nextButton.css({
-						'display' : 'inline-block',
-						'float' : 'right'
-					}).click(function(event) {
+					nextButton.click(function(event) {
 						setItemVisible((visible + 1) % $items.length);
 					})
 				).prepend(
-					prevButton.css({
-						'display' : 'inline-block',
-						'float' : 'left'
-					}).click(function(event) {
+					prevButton.click(function(event) {
 						setItemVisible((visible + $items.length - 1) % $items.length);
 					})
 				);
