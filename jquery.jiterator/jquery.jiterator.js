@@ -16,6 +16,21 @@
 	 * The jiterator plugin converts a UL element from a visual sequence into
 	 * a temporal sequence; that is, it iterates through the items displaying
 	 * them one at a time.
+	 * 
+	 * @param options Options object, overrides defaults.
+	 * 
+	 * @param options.delay Interval in milliseconds between displaying 
+	 *   subsequent items.  Default: 2500
+	 * @param options.previous Text for the previous button.  Default: '&laquo;'
+	 * @param options.next Text for the next button.  Default: '&raquo;'
+	 * @param options.navButtonClass CSS class name for all navigation buttons.
+	 *   Default: 'navButton'
+	 * @param options.previousButtonClass CSS class name for the previous 
+	 *   button.  Default: 'prevButton',
+	 * @param options.nextButtonClass CSS class name for the next button.
+	 *   Default: 'nextButton'
+	 *   
+	 * @return Current jQuery object.
 	 */
 	$.fn.jiterator = function(options) {
 		var options = $.extend({}, $.jiterator.defaultOptions, options);
