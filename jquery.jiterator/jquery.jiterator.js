@@ -51,6 +51,7 @@
 		 */
 		defaultOptions : {
 			'delay' : 2500,
+			'initialDelay' : 0,
 			'previous' : '&laquo;',
 			'next' : '&raquo;',
 			'navButtonClass' : 'navButton',
@@ -112,7 +113,11 @@
 				interval = setInterval(setNextItemVisible, options.delay);
 			};
 			
-			init();
+			if (options.initialDelay > 0) {
+				setTimeout(init, options.initialDelay)
+			} else {
+				init();
+			}
 		}
 	};
 })(jQuery);
