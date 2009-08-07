@@ -21,12 +21,14 @@
 	 * 
 	 * @param options.delay Interval in milliseconds between displaying 
 	 *   subsequent items.  Default: 2500
+	 * @param options.initialDelay Delay in milliseconds before starting the
+	 *   animation.  Any non-positive number starts immediately.  Default: 0
 	 * @param options.previous Text for the previous button.  Default: '&laquo;'
 	 * @param options.next Text for the next button.  Default: '&raquo;'
 	 * @param options.navButtonClass CSS class name for all navigation buttons.
 	 *   Default: 'navButton'
 	 * @param options.previousButtonClass CSS class name for the previous 
-	 *   button.  Default: 'prevButton',
+	 *   button.  Default: 'previousButton',
 	 * @param options.nextButtonClass CSS class name for the next button.
 	 *   Default: 'nextButton'
 	 *   
@@ -54,8 +56,9 @@
 			'initialDelay' : 0,
 			'previous' : '&laquo;',
 			'next' : '&raquo;',
+			'hover' : 'stop',
 			'navButtonClass' : 'navButton',
-			'previousButtonClass' : 'prevButton',
+			'previousButtonClass' : 'previousButton',
 			'nextButtonClass' : 'nextButton'
 		},
 		
@@ -89,7 +92,7 @@
 			/**
 			 * Display the previous item.
 			 */
-			var setPrevItemVisible = function() {
+			var setPreviousItemVisible = function() {
 				setItemVisible(($$.visible + $items.length - 1) % $items.length);
 			};
 			
@@ -100,23 +103,44 @@
 				// Hide all but the first item
 				$$.find('li').not(':first').hide();
 				$$.visible = 0;
+				
 				// Create the previous and next buttons; attach event handlers
 				$$.mouseenter(function(event) {
-					clearInterval(interval);
-					interval = null;
+					if (options.hover == 'stop') {
+						stop();
+					}
 				}).mouseleave(function(event) {
-					interval = setInterval(setItemVisible, options.delay);
+					start();
 				})
-				.prepend($('<a class="'+options.navButtonClass+' '+options.previousButtonClass+'"><span>'+options.previous+'</span></a>').click(setNextItemVisible))
-				.prepend($('<a class="'+options.navButtonClass+' '+options.nextButtonClass+'"><span>'+options.next+'</span></a>').click(setPrevItemVisible));
-				// Set the initial interval
-				interval = setInterval(setNextItemVisible, options.delay);
+				.prepend($('<a class="'+options.navButtonClass+' '+options.previousButtonClass+'"><span>'+options.previous+'</span></a>').click(setPreviousItemVisible))
+				.prepend($('<a class="'+options.navButtonClass+' '+options.nextButtonClass+'"><span>'+options.next+'</span></a>').click(setNextItemVisible));
 			};
 			
+			/**
+			 * Start the animation.
+			 */
+			var start = function() {
+				if (!interval) {
+					interval = setInterval(setNextItemVisible, options.delay);
+				}
+			};
+			
+			/**
+			 * Stop the animation.
+			 */
+			var stop = function() {
+				if (interval) {
+					clearInterval(interval);
+					interval = null;
+				}
+			};
+			
+			// Bootstrap
+			init();
 			if (options.initialDelay > 0) {
-				setTimeout(init, options.initialDelay)
+				setTimeout(start, options.initialDelay);
 			} else {
-				init();
+				start();
 			}
 		}
 	};
