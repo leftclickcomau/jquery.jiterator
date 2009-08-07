@@ -22,7 +22,9 @@
 		$(this).each(function() {
 			var nodeName = this.nodeName.toLowerCase();
 			if (nodeName == 'ul' || nodeName == 'ol') {
-				$.jiterator.create($(this), options);
+				if ($(this).find('li').length > 1) {
+					$.jiterator.create($(this), options);
+				}
 			}
 		});
 		return this;
@@ -46,20 +48,33 @@
 		 */
 		create : function($$, options) {
 			var $items = $$.find('li');
-			var visible = 0;
 			var interval;
 			
 			/**
-			 * Set the item at the given index to be the visible item.
-			 * @param i Item to display.
+			 * Display the item at the given index.
+			 * @param index Item to display.
 			 */
-			var setItemVisible = function(i) {
-				if (i < 0 || i >= $items.length) {
-					var i = (visible + 1) % $items.length;
-				}
-				$items.filter(':eq('+visible+')').fadeOut(function() {
-					$items.filter(':eq('+(visible=i)+')').fadeIn();
+			var setItemVisible = function(index) {
+				var itemOut = $items.filter(':eq(' + $$.visible + ')');
+				var itemIn = $items.filter(':eq(' + index + ')');
+				itemOut.fadeOut(function() {
+					$$.visible = index;
+					itemIn.fadeIn();
 				});
+			};
+			
+			/**
+			 * Display the next item.
+			 */
+			var setNextItemVisible = function() {
+				setItemVisible(($$.visible + 1) % $items.length);
+			};
+			
+			/**
+			 * Display the previous item.
+			 */
+			var setPrevItemVisible = function() {
+				setItemVisible(($$.visible + $items.length - 1) % $items.length);
 			};
 			
 			/**
@@ -68,25 +83,18 @@
 			var init = function() {
 				// Hide all but the first item
 				$$.find('li').not(':first').hide();
+				$$.visible = 0;
 				// Create the previous and next buttons; attach event handlers
-				var prevButton = $('<a class="'+options.navButtonClass+' '+options.previousButtonClass+'"><span>'+options.previous+'</span></a>');
-				var nextButton = $('<a class="'+options.navButtonClass+' '+options.nextButtonClass+'"><span>'+options.next+'</span></a>');
 				$$.mouseenter(function(event) {
 					clearInterval(interval);
 					interval = null;
 				}).mouseleave(function(event) {
 					interval = setInterval(setItemVisible, options.delay);
-				}).prepend(
-					nextButton.click(function(event) {
-						setItemVisible((visible + 1) % $items.length);
-					})
-				).prepend(
-					prevButton.click(function(event) {
-						setItemVisible((visible + $items.length - 1) % $items.length);
-					})
-				);
+				})
+				.prepend($('<a class="'+options.navButtonClass+' '+options.previousButtonClass+'"><span>'+options.previous+'</span></a>').click(setNextItemVisible))
+				.prepend($('<a class="'+options.navButtonClass+' '+options.nextButtonClass+'"><span>'+options.next+'</span></a>').click(setPrevItemVisible));
 				// Set the initial interval
-				interval = setInterval(setItemVisible, options.delay);
+				interval = setInterval(setNextItemVisible, options.delay);
 			};
 			
 			init();
